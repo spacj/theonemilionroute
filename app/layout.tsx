@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   keywords: ['blog', 'business', 'economy', 'finance', 'tutorials'],
   authors: [{ name: 'Zara Ledger' }],
   creator: 'Zara Ledger',
+  other: {
+    'google-adsense-account': 'ca-pub-7503389769071622',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
