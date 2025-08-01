@@ -5,16 +5,17 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CookieConsentBanner from '@/components/CookieConsentBanner'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import { GoogleAdSense } from 'nextjs-google-adsense'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
     template: '%s | My Blog',
-    default: 'One Milion Route - Not Only A Blog'
+    default: 'One Million Route - Not Only A Blog'
   },
   description: 'Discover the latest articles, tutorials, and insights on how to increase your wealth and happiness by starting the right business or side hustle.',
-  keywords: ['blog', 'business', 'econoomy', 'finance', 'tutorials'],
+  keywords: ['blog', 'business', 'economy', 'finance', 'tutorials'],
   authors: [{ name: 'Zara Ledger' }],
   creator: 'Zara Ledger',
   openGraph: {
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
         url: 'https://www.onemilionroute.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'One Milion Route Blog',
+        alt: 'One Million Route Blog',
       },
     ],
   },
@@ -60,6 +61,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <GoogleAnalytics />
+        <GoogleAdSense publisherId="ca-pub-7503389769071622" />
         <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-1 mt-[7vh]">

@@ -1,9 +1,9 @@
+// components/GoogleAnalytics.tsx
 'use client'
 
 import Script from 'next/script'
 
 const GA_MEASUREMENT_ID = 'G-T70E5SKZ10'
-const ADSENSE_CLIENT_ID = 'ca-pub-7503389769071622'
 
 export default function GoogleAnalytics() {
   if (process.env.NODE_ENV !== 'production') {
@@ -12,7 +12,7 @@ export default function GoogleAnalytics() {
 
   return (
     <>
-      {/* Google Analytics */}
+      {/* Google Analytics only */}
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy="afterInteractive"
@@ -27,13 +27,6 @@ export default function GoogleAnalytics() {
           });
         `}
       </Script>
-      
-      {/* Google AdSense */}
-      <Script
-        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-        crossOrigin="anonymous"
-        strategy="afterInteractive"
-      />
     </>
   )
 }
