@@ -19,7 +19,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-gray-900">TheOneMilionRoute</span>
+            <span className="text-2xl font-bold uppercase text-gray-900">OneMilionRoute</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -28,7 +28,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-md uppercase font-medium transition-colors"
               >
                 {item.name}
               </Link>

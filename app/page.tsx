@@ -14,11 +14,14 @@ export default function Home() {
       <section className="mb-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Welcome to <span className="text-blue-600">MyBlog</span>
+            Welcome to <br/><span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+              One Million Route
+              </span>
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover the latest articles, tutorials, and insights on web development, 
-            technology, and more. Stay updated with cutting-edge trends and best practices.
+          This blog is your companion on the journey to your first million dollars.
+          We share honest, practical strategies to help you grow your income, build good money habits, and invest with confidence—without the hype or shortcuts.
+          Step by step, dollar by dollar—you’ve got this.
           </p>
         </div>
 

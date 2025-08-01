@@ -10,29 +10,29 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: {
     template: '%s | My Blog',
-    default: 'My Blog - Latest Articles & Insights'
+    default: 'One Milion Route - Not Only A Blog'
   },
-  description: 'Discover the latest articles, tutorials, and insights on web development, technology, and more.',
-  keywords: ['blog', 'technology', 'web development', 'programming', 'tutorials'],
-  authors: [{ name: 'Your Name' }],
-  creator: 'Your Name',
+  description: 'Discover the latest articles, tutorials, and insights on how to increase your wealth and happiness by starting the right business or side hustle.',
+  keywords: ['blog', 'business', 'econoomy', 'finance', 'tutorials'],
+  authors: [{ name: 'Zara Ledger' }],
+  creator: 'Zara Ledger',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://yourblog.com',
+    url: 'https://www.onemilionroute.com/',
     siteName: 'My Blog',
     images: [
       {
-        url: 'https://yourblog.com/og-image.jpg',
+        url: 'https://www.onemilionroute.com/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'My Blog',
+        alt: 'One Milion Route Blog',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'My Blog',
+    title: 'OneMilionRoute.com',
     description: 'Latest articles and insights',
     creator: '@yourusername',
     images: ['https://yourblog.com/twitter-image.jpg'],

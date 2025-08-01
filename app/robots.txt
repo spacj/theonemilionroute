@@ -1,0 +1,35 @@
+# public/robots.txt
+User-agent: *
+Allow: /
+
+# Block admin, API, and low-value pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /search?
+Disallow: /404
+Disallow: /500
+
+# Specific crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot  
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Crawl delay for aggressive bots
+User-agent: *
+Crawl-delay: 1
+
+# Reference your sitemaps
+Sitemap: https://www.onemilionroute.com/sitemap.xml
+Sitemap: https://www.onemilionroute.com/sitemap-images.xml
