@@ -69,6 +69,7 @@ export default function RootLayout({
           name="monetag"
           content="dd4b7fc20cef71782cf58269b1801a63"
         />
+        <meta name="google-site-verification" content="Y-sQ2Lc1bT1-_rOV0GBrhk96hLdcK6YWawdcLVgDgvE" />
       </head>
       <body className={inter.className}>
       <script src="https://fpyf8.com/88/tag.min.js" data-zone="164242" async data-cfasync="false"></script>
