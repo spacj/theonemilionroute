@@ -63,6 +63,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* 👇 Monetag verification */}
+        <meta
+          name="monetag"
+          content="dd4b7fc20cef71782cf58269b1801a63"
+        />
+      </head>
       <body className={inter.className}>
         <GoogleAnalytics />
         <GoogleAdSense publisherId="ca-pub-7503389769071622" />
