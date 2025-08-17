@@ -70,8 +70,9 @@ export default function RootLayout({
           content="dd4b7fc20cef71782cf58269b1801a63"
         />
       </head>
-      <script src="https://fpyf8.com/88/tag.min.js" data-zone="164242" async data-cfasync="false"></script>
       <body className={inter.className}>
+      <script src="https://fpyf8.com/88/tag.min.js" data-zone="164242" async data-cfasync="false"></script>
+
         <GoogleAnalytics />
         <GoogleAdSense publisherId="ca-pub-7503389769071622" />
         <div className="min-h-screen flex flex-col">
