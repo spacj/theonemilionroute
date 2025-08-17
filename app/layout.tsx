@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'Zara Ledger' }],
   creator: 'Zara Ledger',
   other: {
+    'monetag' : "dd4b7fc20cef71782cf58269b1801a63",
     'google-adsense-account': 'ca-pub-7503389769071622',
   },
   openGraph: {
