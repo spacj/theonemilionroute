@@ -187,7 +187,7 @@ function getUniqueCategories(posts: MDXPost[]): string[] {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://onemilionroute.com'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!
   
   // Get all MDX posts
   const posts = await getAllPosts()
