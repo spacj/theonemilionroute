@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       authors: [post.author],
       images: [
         {
-          url: `https://yourdomain.com${post.image}`,
+          url: `https://onemilionroute.com${post.image}`,
           width: 1200,
           height: 630,
           alt: post.title,
@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: post.title,
       description: post.subtitle,
-      images: [`https://yourdomain.com${post.image}`],
+      images: [`https://onemilionroute.com${post.image}`],
     },
   }
 }
