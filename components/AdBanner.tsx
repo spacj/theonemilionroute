@@ -1,55 +1,49 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface AdBannerProps {
-  size?: 'banner' | 'rectangle' | 'leaderboard'
   className?: string
-  slotId?: string
 }
 
-export default function AdBanner({ 
-  size = 'banner', 
-  className = '', 
-  slotId = '2692266383' 
-}: AdBannerProps) {
-  const dimensions = {
-    banner: 'w-full h-32',
-    rectangle: 'w-80 h-64',
-    leaderboard: 'w-full h-24'
-  }
+export default function AdBanner({ className = '' }: AdBannerProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    try {
-      // Check if adsbygoogle is available and push the ad
-      if (typeof window !== 'undefined' && window.adsbygoogle) {
-        (window.adsbygoogle as any[]).push({})
+    if (!containerRef.current) return
+
+    // Define global atOptions variable
+    ;(window as any).atOptions = {
+      key: '27504ca59bdb46ccd7f71e8d4391cc7b',
+      format: 'iframe',
+      height: 250,
+      width: 300,
+      params: {}
+    }
+
+    // Create script element for the ad network
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src =
+      '//www.highperformanceformat.com/27504ca59bdb46ccd7f71e8d4391cc7b/invoke.js'
+
+    // Append into container
+    containerRef.current.innerHTML = '' // clear old
+    containerRef.current.appendChild(script)
+
+    return () => {
+      // Cleanup
+      if (containerRef.current) {
+        containerRef.current.innerHTML = ''
       }
-    } catch (error) {
-      console.error('AdSense error:', error)
     }
   }, [])
 
   return (
-    <div className={`${dimensions[size]} ${className} my-8`}>
-      <ins 
-        className="adsbygoogle"
-        style={{ 
-          display: 'block', 
-          textAlign: 'center' 
-        }}
-        data-ad-layout="in-article"
-        data-ad-format="fluid"
-        data-ad-client="ca-pub-7503389769071622"
-        data-ad-slot={slotId}
-      />
-    </div>
+    <div
+      ref={containerRef}
+      className={`my-8 flex justify-center ${className}`}
+      style={{ width: 300, height: 250 }}
+    />
   )
-}
-
-// You also need to add this to your global types (types/global.d.ts or similar):
-declare global {
-  interface Window {
-    adsbygoogle: any[]
-  }
 }
