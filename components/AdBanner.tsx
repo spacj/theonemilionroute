@@ -43,8 +43,8 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
     },
     profitable: {
       key: '88c068bbf8c2b80cd814befc8405cbbd',
-      height: 250,
-      width: 300,
+      height: 200,
+      width: 250,
       type: 'profitable',
       src: '//pl27454512.profitableratecpm.com/88c068bbf8c2b80cd814befc8405cbbd/invoke.js'
     }
@@ -54,6 +54,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
     if (!containerRef.current) return
 
     const config = adConfigs[adType]
+    const showDouble = adType === 'banner'
     
     // Clear container first
     containerRef.current.innerHTML = ''
@@ -73,6 +74,18 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       script.type = 'text/javascript'
       script.src = config.src
       containerRef.current.appendChild(script)
+
+      // For banner ads, create second ad for medium+ screens
+      if (showDouble) {
+        const secondContainer = document.getElementById('second-banner-container')
+        if (secondContainer) {
+          secondContainer.innerHTML = ''
+          const secondScript = document.createElement('script')
+          secondScript.type = 'text/javascript'
+          secondScript.src = config.src
+          secondContainer.appendChild(secondScript)
+        }
+      }
       
     } else if (config.type === 'profitable') {
       // Create script element with async attribute
@@ -95,17 +108,44 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       if (containerRef.current) {
         containerRef.current.innerHTML = ''
       }
+      // Cleanup second banner if it exists
+      if (showDouble) {
+        const secondContainer = document.getElementById('second-banner-container')
+        if (secondContainer) {
+          secondContainer.innerHTML = ''
+        }
+      }
     }
   }, [adType]) // Re-run effect when adType changes
 
   const config = adConfigs[adType]
+  const showDouble = adType === 'banner' // Only show double for banner ads
 
   return (
-    <div
-      ref={containerRef}
-      className={`my-8 flex justify-center ${className}`}
-      style={{ width: config.width, height: config.height }}
-    />
+    <div className={`my-8 flex justify-center items-center ${className}`}>
+      {showDouble ? (
+        // Double banner layout for medium screens and up
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
+          <div
+            ref={containerRef}
+            className="flex justify-center"
+            style={{ width: config.width, height: config.height }}
+          />
+          <div
+            className="flex justify-center md:block hidden"
+            style={{ width: config.width, height: config.height }}
+            id="second-banner-container"
+          />
+        </div>
+      ) : (
+        // Single ad layout
+        <div
+          ref={containerRef}
+          className="flex justify-center"
+          style={{ width: config.width, height: config.height }}
+        />
+      )}
+    </div>
   )
 }
 
