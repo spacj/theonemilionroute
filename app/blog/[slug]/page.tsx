@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!post) {
     return { title: 'Post Not Found' }
   }
-  const absoluteImage = `https://onemilionroute.com/images${post.image}`
+  const absoluteImage = post.image.startsWith('/images') 
+  ? `https://onemilionroute.com${post.image}`
+  : `https://onemilionroute.com/images${post.image}`
   return {
     title: post.title,
     description: post.subtitle,
