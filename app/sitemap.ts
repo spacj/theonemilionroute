@@ -1,4 +1,4 @@
-// app/sitemap.tsx - MDX Content Sitemap
+// app/sitemap.tsx - Fixed MDX Content Sitemap
 import { MetadataRoute } from 'next'
 import fs from 'fs'
 import path from 'path'
@@ -16,8 +16,8 @@ interface MDXPost {
 }
 
 // Configuration - adjust these paths to match your setup
-const CONTENT_DIR = path.join(process.cwd(), 'content') // or 'posts', 'articles', etc.
-const BLOG_DIR = path.join(CONTENT_DIR, 'blog') // if you have subdirectories
+const CONTENT_DIR = path.join(process.cwd(), 'content')
+const BLOG_DIR = path.join(CONTENT_DIR, 'blog')
 const GUIDES_DIR = path.join(CONTENT_DIR, 'guides')
 
 function getAllMDXFiles(dir: string): string[] {
@@ -27,17 +27,20 @@ function getAllMDXFiles(dir: string): string[] {
     return files
   }
   
-  const items = fs.readdirSync(dir, { withFileTypes: true })
-  
-  for (const item of items) {
-    const fullPath = path.join(dir, item.name)
+  try {
+    const items = fs.readdirSync(dir, { withFileTypes: true })
     
-    if (item.isDirectory()) {
-      // Recursively get files from subdirectories
-      files.push(...getAllMDXFiles(fullPath))
-    } else if (item.name.endsWith('.mdx') || item.name.endsWith('.md')) {
-      files.push(fullPath)
+    for (const item of items) {
+      const fullPath = path.join(dir, item.name)
+      
+      if (item.isDirectory()) {
+        files.push(...getAllMDXFiles(fullPath))
+      } else if (item.name.endsWith('.mdx') || item.name.endsWith('.md')) {
+        files.push(fullPath)
+      }
     }
+  } catch (error) {
+    console.error(`Error reading directory ${dir}:`, error)
   }
   
   return files
@@ -52,16 +55,28 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
     const relativePath = path.relative(CONTENT_DIR, filePath)
     const slug = relativePath
       .replace(/\.(mdx?|md)$/, '')
-      .replace(/\\/g, '/') // Handle Windows paths
+      .replace(/\\/g, '/')
     
     // Get file stats for last modified date
     const stats = fs.statSync(filePath)
     
+    // Ensure date is in proper format
+    let postDate = frontMatter.date || frontMatter.publishedAt || stats.birthtime.toISOString()
+    if (typeof postDate === 'string' && !postDate.includes('T')) {
+      // If date is just YYYY-MM-DD, add time
+      postDate = `${postDate}T00:00:00Z`
+    }
+    
+    let lastModified = frontMatter.lastModified || frontMatter.updated || stats.mtime.toISOString()
+    if (typeof lastModified === 'string' && !lastModified.includes('T')) {
+      lastModified = `${lastModified}T00:00:00Z`
+    }
+    
     return {
       slug,
       title: frontMatter.title || 'Untitled',
-      date: frontMatter.date || frontMatter.publishedAt || stats.birthtime.toISOString(),
-      lastModified: frontMatter.lastModified || frontMatter.updated || stats.mtime.toISOString(),
+      date: postDate,
+      lastModified,
       category: frontMatter.category || frontMatter.tags?.[0] || contentType,
       featured: frontMatter.featured || false,
       priority: frontMatter.priority,
@@ -74,19 +89,16 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
 }
 
 function calculatePriority(post: MDXPost): number {
-  // Use manual priority if set in frontmatter
   if (post.priority) {
     return Math.min(Math.max(post.priority, 0.1), 0.9)
   }
   
-  let priority = 0.6 // Base priority
+  let priority = 0.6
   
-  // Featured content
   if (post.featured) {
     priority += 0.1
   }
   
-  // Recent content (last 6 months)
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
   const postDate = new Date(post.lastModified || post.date)
@@ -95,7 +107,6 @@ function calculatePriority(post: MDXPost): number {
     priority += 0.05
   }
   
-  // Category-based priority
   const highPriorityCategories = [
     'investing', 'budgeting', 'savings', 'retirement', 
     'guide', 'tutorial', 'money-management'
@@ -107,16 +118,14 @@ function calculatePriority(post: MDXPost): number {
     priority += 0.05
   }
   
-  return Math.min(priority, 0.8) // Cap at 0.8 for content pages
+  return Math.min(priority, 0.8)
 }
 
 function getChangeFrequency(post: MDXPost): 'daily' | 'weekly' | 'monthly' | 'yearly' {
-  // Use manual setting if provided
   if (post.changeFreq) {
     return post.changeFreq
   }
   
-  // Base on category or content type
   if (post.category) {
     const category = post.category.toLowerCase()
     
@@ -133,13 +142,12 @@ function getChangeFrequency(post: MDXPost): 'daily' | 'weekly' | 'monthly' | 'ye
     }
   }
   
-  return 'monthly' // Default
+  return 'monthly'
 }
 
 async function getAllPosts(): Promise<MDXPost[]> {
   const posts: MDXPost[] = []
   
-  // Get blog posts
   if (fs.existsSync(BLOG_DIR)) {
     const blogFiles = getAllMDXFiles(BLOG_DIR)
     for (const file of blogFiles) {
@@ -148,7 +156,6 @@ async function getAllPosts(): Promise<MDXPost[]> {
     }
   }
   
-  // Get guides
   if (fs.existsSync(GUIDES_DIR)) {
     const guideFiles = getAllMDXFiles(GUIDES_DIR)
     for (const file of guideFiles) {
@@ -157,7 +164,6 @@ async function getAllPosts(): Promise<MDXPost[]> {
     }
   }
   
-  // If you have a flat content structure, just scan the main content dir
   if (!fs.existsSync(BLOG_DIR) && !fs.existsSync(GUIDES_DIR)) {
     const allFiles = getAllMDXFiles(CONTENT_DIR)
     for (const file of allFiles) {
@@ -166,11 +172,9 @@ async function getAllPosts(): Promise<MDXPost[]> {
     }
   }
   
-  // Filter out drafts and unpublished content
   return posts.filter(post => {
-    // Add your filtering logic here
-    // e.g., exclude posts with draft: true in frontmatter
-    return post.title !== 'Untitled'
+    // Filter out drafts and invalid posts
+    return post.title !== 'Untitled' && !post.title.toLowerCase().includes('draft')
   })
 }
 
@@ -187,13 +191,18 @@ function getUniqueCategories(posts: MDXPost[]): string[] {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL!
+  // Ensure base URL is set
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
   
-  // Get all MDX posts
+  if (!baseUrl) {
+    console.error('NEXT_PUBLIC_BASE_URL environment variable is not set!')
+    throw new Error('NEXT_PUBLIC_BASE_URL is required for sitemap generation')
+  }
+  
   const posts = await getAllPosts()
   const categories = getUniqueCategories(posts)
   
-  console.log(`Found ${posts.length} MDX posts and ${categories.length} categories`)
+  console.log(`Sitemap: Found ${posts.length} MDX posts and ${categories.length} categories`)
   
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -211,19 +220,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: new Date('2024-01-15T00:00:00Z'), // Update with actual date
+      lastModified: new Date('2024-01-15T00:00:00Z'),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/contact`,
-      lastModified: new Date('2024-01-10T00:00:00Z'), // Update with actual date
+      lastModified: new Date('2024-01-10T00:00:00Z'),
       changeFrequency: 'yearly',
       priority: 0.6,
     },
   ]
   
-  // Category pages (if you have them)
+  // Category pages
   const categoryPages: MetadataRoute.Sitemap = categories.map(category => ({
     url: `${baseUrl}/category/${category.toLowerCase().replace(/\s+/g, '-')}`,
     lastModified: new Date(),
@@ -231,21 +240,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
   
-  // Blog post pages
+  // Blog post pages - URL structure: /blog/post-slug
   const postPages: MetadataRoute.Sitemap = posts.map(post => ({
-    url: `${baseUrl}/${post.slug}`, // Adjust URL structure as needed
+    url: `${baseUrl}/blog/${post.slug}`, // Matches: /blog/freecash-review
     lastModified: new Date(post.lastModified || post.date),
     changeFrequency: getChangeFrequency(post),
     priority: calculatePriority(post),
   }))
   
-  // Combine all pages
   const allPages = [
     ...staticPages,
     ...categoryPages,
     ...postPages,
   ]
   
-  // Sort by priority (highest first)
   return allPages.sort((a, b) => (b.priority || 0) - (a.priority || 0))
 }
