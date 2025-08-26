@@ -52,9 +52,17 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
     const fileContent = fs.readFileSync(filePath, 'utf8')
     const { data: frontMatter } = matter(fileContent)
     
-    // Extract just the filename without extension as the slug
-    const fileName = path.basename(filePath, path.extname(filePath))
-    const slug = fileName
+    // Extract slug - prefer frontmatter slug, fallback to filename
+    let slug: string
+    
+    if (frontMatter.slug) {
+      // Use custom slug from frontmatter if available
+      slug = frontMatter.slug
+    } else {
+      // Extract just the filename without extension as the slug
+      const fileName = path.basename(filePath, path.extname(filePath))
+      slug = fileName
+    }
     
     // Get file stats for last modified date
     const stats = fs.statSync(filePath)
@@ -195,7 +203,16 @@ function getUniqueCategories(posts: MDXPost[]): string[] {
 
 function generatePostURL(baseUrl: string, post: MDXPost): string {
   // All content goes under /blog/ regardless of source directory
-  return `${baseUrl}/blog/${post.slug}`
+  // Clean up the slug to make it URL-friendly
+  const cleanSlug = post.slug
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric characters with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
+    .substring(0, 80) // Limit length to 80 characters for better SEO
+    .replace(/-$/, '') // Remove trailing hyphen if substring created one
+  
+  return `${baseUrl}/blog/${cleanSlug}`
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
