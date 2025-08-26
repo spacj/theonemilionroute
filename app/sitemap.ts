@@ -13,6 +13,7 @@ interface MDXPost {
   featured?: boolean
   priority?: number
   changeFreq?: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  contentType: 'blog' | 'guide' | 'article'
 }
 
 // Configuration - adjust these paths to match your setup
@@ -51,11 +52,28 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
     const fileContent = fs.readFileSync(filePath, 'utf8')
     const { data: frontMatter } = matter(fileContent)
     
-    // Extract slug from file path
-    const relativePath = path.relative(CONTENT_DIR, filePath)
-    const slug = relativePath
-      .replace(/\.(mdx?|md)$/, '')
-      .replace(/\\/g, '/')
+    // Extract slug from file path - this is the key fix
+    let slug: string
+    
+    if (contentType === 'blog') {
+      // For blog posts, remove the blog directory and content directory from path
+      const relativeToBlog = path.relative(BLOG_DIR, filePath)
+      slug = relativeToBlog
+        .replace(/\.(mdx?|md)$/, '')
+        .replace(/\\/g, '/')
+    } else if (contentType === 'guide') {
+      // For guides, remove the guides directory and content directory from path
+      const relativeToGuides = path.relative(GUIDES_DIR, filePath)
+      slug = relativeToGuides
+        .replace(/\.(mdx?|md)$/, '')
+        .replace(/\\/g, '/')
+    } else {
+      // For other articles, use relative to content directory
+      const relativePath = path.relative(CONTENT_DIR, filePath)
+      slug = relativePath
+        .replace(/\.(mdx?|md)$/, '')
+        .replace(/\\/g, '/')
+    }
     
     // Get file stats for last modified date
     const stats = fs.statSync(filePath)
@@ -80,7 +98,8 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
       category: frontMatter.category || frontMatter.tags?.[0] || contentType,
       featured: frontMatter.featured || false,
       priority: frontMatter.priority,
-      changeFreq: frontMatter.changeFreq || 'monthly'
+      changeFreq: frontMatter.changeFreq || 'monthly',
+      contentType
     }
   } catch (error) {
     console.error(`Error parsing MDX file ${filePath}:`, error)
@@ -148,6 +167,7 @@ function getChangeFrequency(post: MDXPost): 'daily' | 'weekly' | 'monthly' | 'ye
 async function getAllPosts(): Promise<MDXPost[]> {
   const posts: MDXPost[] = []
   
+  // Process blog posts
   if (fs.existsSync(BLOG_DIR)) {
     const blogFiles = getAllMDXFiles(BLOG_DIR)
     for (const file of blogFiles) {
@@ -156,6 +176,7 @@ async function getAllPosts(): Promise<MDXPost[]> {
     }
   }
   
+  // Process guide posts
   if (fs.existsSync(GUIDES_DIR)) {
     const guideFiles = getAllMDXFiles(GUIDES_DIR)
     for (const file of guideFiles) {
@@ -164,6 +185,7 @@ async function getAllPosts(): Promise<MDXPost[]> {
     }
   }
   
+  // Fallback: process all files in content directory if specific dirs don't exist
   if (!fs.existsSync(BLOG_DIR) && !fs.existsSync(GUIDES_DIR)) {
     const allFiles = getAllMDXFiles(CONTENT_DIR)
     for (const file of allFiles) {
@@ -190,6 +212,19 @@ function getUniqueCategories(posts: MDXPost[]): string[] {
   return Array.from(categories)
 }
 
+function generatePostURL(baseUrl: string, post: MDXPost): string {
+  // Generate URL based on content type
+  switch (post.contentType) {
+    case 'blog':
+      return `${baseUrl}/blog/${post.slug}`
+    case 'guide':
+      return `${baseUrl}/guides/${post.slug}`
+    default:
+      // For articles or other content types, use the slug as-is
+      return `${baseUrl}/${post.slug}`
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Ensure base URL is set
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
@@ -203,6 +238,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const categories = getUniqueCategories(posts)
   
   console.log(`Sitemap: Found ${posts.length} MDX posts and ${categories.length} categories`)
+  console.log('Sample post URLs:')
+  posts.slice(0, 3).forEach(post => {
+    console.log(`- ${generatePostURL(baseUrl, post)} (${post.contentType}: ${post.slug})`)
+  })
   
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -217,6 +256,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,
@@ -240,9 +285,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
   
-  // Blog post pages - URL structure: /blog/post-slug
-  const postPages: MetadataRoute.Sitemap = posts.map(post => ({
-    url: `${baseUrl}/blog/${post.slug}`, // Matches: /blog/freecash-review
+  // Content pages with correct URL generation
+  const contentPages: MetadataRoute.Sitemap = posts.map(post => ({
+    url: generatePostURL(baseUrl, post),
     lastModified: new Date(post.lastModified || post.date),
     changeFrequency: getChangeFrequency(post),
     priority: calculatePriority(post),
@@ -251,7 +296,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const allPages = [
     ...staticPages,
     ...categoryPages,
-    ...postPages,
+    ...contentPages,
   ]
   
   return allPages.sort((a, b) => (b.priority || 0) - (a.priority || 0))
