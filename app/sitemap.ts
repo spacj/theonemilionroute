@@ -52,28 +52,9 @@ function parseMDXFile(filePath: string, contentType: 'blog' | 'guide' | 'article
     const fileContent = fs.readFileSync(filePath, 'utf8')
     const { data: frontMatter } = matter(fileContent)
     
-    // Extract slug from file path - this is the key fix
-    let slug: string
-    
-    if (contentType === 'blog') {
-      // For blog posts, remove the blog directory and content directory from path
-      const relativeToBlog = path.relative(BLOG_DIR, filePath)
-      slug = relativeToBlog
-        .replace(/\.(mdx?|md)$/, '')
-        .replace(/\\/g, '/')
-    } else if (contentType === 'guide') {
-      // For guides, remove the guides directory and content directory from path
-      const relativeToGuides = path.relative(GUIDES_DIR, filePath)
-      slug = relativeToGuides
-        .replace(/\.(mdx?|md)$/, '')
-        .replace(/\\/g, '/')
-    } else {
-      // For other articles, use relative to content directory
-      const relativePath = path.relative(CONTENT_DIR, filePath)
-      slug = relativePath
-        .replace(/\.(mdx?|md)$/, '')
-        .replace(/\\/g, '/')
-    }
+    // Extract just the filename without extension as the slug
+    const fileName = path.basename(filePath, path.extname(filePath))
+    const slug = fileName
     
     // Get file stats for last modified date
     const stats = fs.statSync(filePath)
@@ -213,16 +194,8 @@ function getUniqueCategories(posts: MDXPost[]): string[] {
 }
 
 function generatePostURL(baseUrl: string, post: MDXPost): string {
-  // Generate URL based on content type
-  switch (post.contentType) {
-    case 'blog':
-      return `${baseUrl}/blog/${post.slug}`
-    case 'guide':
-      return `${baseUrl}/guides/${post.slug}`
-    default:
-      // For articles or other content types, use the slug as-is
-      return `${baseUrl}/${post.slug}`
-  }
+  // All content goes under /blog/ regardless of source directory
+  return `${baseUrl}/blog/${post.slug}`
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -240,7 +213,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   console.log(`Sitemap: Found ${posts.length} MDX posts and ${categories.length} categories`)
   console.log('Sample post URLs:')
   posts.slice(0, 3).forEach(post => {
-    console.log(`- ${generatePostURL(baseUrl, post)} (${post.contentType}: ${post.slug})`)
+    console.log(`- ${generatePostURL(baseUrl, post)} (from: ${post.slug}.mdx)`)
   })
   
   // Static pages
