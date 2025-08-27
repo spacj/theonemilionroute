@@ -47,7 +47,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       height: 200,
       width: 400,
       videoSrc: '/videos/germanguide.mp4',
-      link: 'https://example2.com' // Replace with your actual link
+      link: 'https://malekai72.gumroad.com/l/losta' // Replace with your actual link
     },
     // Square image ad(s) - auto height
     'image-square': {
