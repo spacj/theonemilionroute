@@ -64,6 +64,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="google-site-verification" content="Y-sQ2Lc1bT1-_rOV0GBrhk96hLdcK6YWawdcLVgDgvE" />
+        <meta name="mylead-verification" content="1ea0ea683d6cca92a8ead77fb93de71e"></meta>
       </head>
       <body className={inter.className}>
 
