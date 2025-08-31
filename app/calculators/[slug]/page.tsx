@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import CalculatorComponent from '@/components/CalculatorComponent';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import AdBanner from '@/components/AdBanner';
 
 interface Props {
   params: {
@@ -71,6 +72,8 @@ export default function CalculatorPage({ params }: Props) {
         </div>
       </div>
 
+      <AdBanner adType="video-horizontal-1" />
+
       {/* Calculator Component */}
       <CalculatorComponent calculatorId={calculator.id} />
 
@@ -101,6 +104,8 @@ export default function CalculatorPage({ params }: Props) {
           </div>
         </section>
       )}
+      
+      <AdBanner adType="video-horizontal-2" />
 
       {/* SEO Content */}
       <section className="py-16 bg-gray-50">
@@ -163,6 +168,7 @@ export default function CalculatorPage({ params }: Props) {
           </div>
         </div>
       </section>
+      <AdBanner adType="image-portrait-1" />  
     </div>
   );
 }

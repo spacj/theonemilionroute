@@ -4,7 +4,7 @@ import { Calculator, TrendingUp, DollarSign, PiggyBank, Home, Target, CreditCard
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Financial Calculators | Your Blog Name',
+  title: 'Financial Calculators',
   description: 'Free financial calculators including compound interest, loan payments, retirement planning, and investment growth calculators.',
   keywords: 'financial calculators, compound interest calculator, loan calculator, retirement calculator, investment calculator',
   openGraph: {

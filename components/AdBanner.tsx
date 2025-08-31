@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useRef } from 'react'
-type AdType = 'banner' | 'video-horizontal-1' | 'video-horizontal-2' | 'image-square'
+
+type AdType = 'banner' | 'video-horizontal-1' | 'video-horizontal-2' | 'image-square' | 'image-portrait-1' | 'image-portrait-2'
+
 interface AdConfig {
   key?: string
   format?: string
@@ -14,13 +16,17 @@ interface AdConfig {
   link?: string
   secondImageSrc?: string
   secondLink?: string
+  aspectRatio?: string
 }
+
 interface AdBannerProps {
   className?: string
   adType?: AdType
 }
+
 export default function AdBanner({ className = '', adType = 'banner' }: AdBannerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+
   // Ad configurations for different types
   const adConfigs: Record<AdType, AdConfig> = {
     // Original Adsterra banner configuration
@@ -57,11 +63,32 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       imageSrc: '/images/n26refer.jpg',
       link: 'https://example3.com', // Replace with your actual link
       secondImageSrc: '/images/n26refer.jpg',
-      secondLink: 'https://example4.com' // Replace with your actual link for second image
+      secondLink: 'https://example4.com', // Replace with your actual link for second image
+      aspectRatio: '1:1'
+    },
+    // First 4:5 portrait image ad
+    'image-portrait-1': {
+      type: 'image',
+      height: 0, // Auto height based on aspect ratio
+      width: 240,
+      imageSrc: '/images/portrait-ad-1.jpg', // Replace with your actual image path
+      link: 'https://amzn.to/4m3ScKQ', // Replace with your actual link
+      aspectRatio: '4:5'
+    },
+    // Second 4:5 portrait image ad
+    'image-portrait-2': {
+      type: 'image',
+      height: 0, // Auto height based on aspect ratio
+      width: 240,
+      imageSrc: '/images/portrait-ad-2.jpg', // Replace with your actual image path
+      link: 'https://www.amazon.com/dp/B0FPBV1S3F', // Replace with your actual link
+      aspectRatio: '4:5'
     }
   }
+
   useEffect(() => {
     if (!containerRef.current) return
+
     const config = adConfigs[adType]
     const showDouble = adType === 'banner'
    
@@ -77,10 +104,12 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
         width: config.width,
         params: config.params
       }
+
       const script = document.createElement('script')
       script.type = 'text/javascript'
       script.src = config.src!
       containerRef.current.appendChild(script)
+
       if (showDouble) {
         const secondContainer = document.getElementById('second-banner-container')
         if (secondContainer) {
@@ -92,6 +121,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
         }
       }
     }
+
     return () => {
       if (containerRef.current) {
         containerRef.current.innerHTML = ''
@@ -104,9 +134,12 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       }
     }
   }, [adType])
+
   const config = adConfigs[adType]
   const showDouble = adType === 'banner'
   const showDoubleImages = adType === 'image-square'
+  const isPortraitImage = adType === 'image-portrait-1' || adType === 'image-portrait-2'
+
   // Render video ad
   if (config.type === 'video') {
     return (
@@ -131,8 +164,40 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       </div>
     )
   }
+
   // Render image ad(s)
   if (config.type === 'image') {
+    // Portrait image ads - single image, centered
+    if (isPortraitImage) {
+      return (
+        <div className={`my-8 flex justify-center items-center ${className}`}>
+          <div className="group relative max-w-xs mx-auto">
+            <a
+              href={config.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <div className="relative overflow-hidden rounded-xl shadow-lg group-hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 group-hover:scale-105">
+                <img
+                  src={config.imageSrc}
+                  alt="Advertisement"
+                  className="w-full h-auto transition-transform duration-300 group-hover:scale-110"
+                  style={{ 
+                    display: 'block',
+                    aspectRatio: config.aspectRatio || 'auto'
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 ring-2 ring-transparent group-hover:ring-blue-400/50 rounded-xl transition-all duration-300"></div>
+              </div>
+            </a>
+          </div>
+        </div>
+      )
+    }
+
+    // Square image ads - double layout
     return (
       <div className={`my-8 flex justify-center items-center ${className}`}>
         <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10 lg:gap-12 items-start justify-center max-w-4xl mx-auto">
@@ -149,7 +214,10 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
                   src={config.imageSrc}
                   alt="Advertisement"
                   className="w-full h-auto transition-transform duration-300 group-hover:scale-110"
-                  style={{ display: 'block' }}
+                  style={{ 
+                    display: 'block',
+                    aspectRatio: config.aspectRatio || 'auto'
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute inset-0 ring-2 ring-transparent group-hover:ring-blue-400/50 rounded-xl transition-all duration-300"></div>
@@ -171,7 +239,10 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
                     src={config.secondImageSrc}
                     alt="Advertisement"
                     className="w-full h-auto transition-transform duration-300 group-hover:scale-110"
-                    style={{ display: 'block' }}
+                    style={{ 
+                      display: 'block',
+                      aspectRatio: config.aspectRatio || 'auto'
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <div className="absolute inset-0 ring-2 ring-transparent group-hover:ring-blue-400/50 rounded-xl transition-all duration-300"></div>
@@ -183,6 +254,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       </div>
     )
   }
+
   // Render original Adsterra banner
   return (
     <div className={`my-8 flex justify-center items-center ${className}`}>
@@ -209,8 +281,11 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
     </div>
   )
 }
+
 // Usage examples:
 // <AdBanner adType="banner" />              // Original Adsterra 300x250 banner with double layout
 // <AdBanner adType="video-horizontal-1" />  // First horizontal video ad (responsive)
 // <AdBanner adType="video-horizontal-2" />  // Second horizontal video ad (responsive)
 // <AdBanner adType="image-square" />        // Square image ad(s) - single on mobile, double on larger screens
+// <AdBanner adType="image-portrait-1" />    // First 4:5 portrait image ad (single, centered)
+// <AdBanner adType="image-portrait-2" />    // Second 4:5 portrait image ad (single, centered)
