@@ -108,8 +108,8 @@ export default function CalculatorPage({ params }: Props) {
         </section>
       )}
        
-      <div className='max-w-[80vw]'>
-      <AdBanner adType="video-horizontal-2" />
+      <div className='flex items-center justify-center m-0 p-0'>
+      <AdBanner adType="video-horizontal-2" className='sm:w-[90vw] w-[80vw] max-h-[20vh]' />
       </div> 
 
       {/* SEO Content */}
