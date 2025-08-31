@@ -72,7 +72,10 @@ export default function CalculatorPage({ params }: Props) {
         </div>
       </div>
 
+      <div className='max-w-[80vw]'>
       <AdBanner adType="video-horizontal-1" />
+      </div>
+
 
       {/* Calculator Component */}
       <CalculatorComponent calculatorId={calculator.id} />
@@ -104,8 +107,10 @@ export default function CalculatorPage({ params }: Props) {
           </div>
         </section>
       )}
-      
+       
+      <div className='max-w-[80vw]'>
       <AdBanner adType="video-horizontal-2" />
+      </div> 
 
       {/* SEO Content */}
       <section className="py-16 bg-gray-50">
@@ -168,7 +173,10 @@ export default function CalculatorPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <div className='max-w-[80vw]'>
       <AdBanner adType="image-portrait-1" />  
+      </div>
     </div>
   );
 }
