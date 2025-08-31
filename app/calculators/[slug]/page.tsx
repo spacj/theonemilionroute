@@ -1,4 +1,3 @@
-
 // app/calculators/[slug]/page.tsx - Dynamic calculator pages
 import { calculators } from '@/config/calculators';
 import { generateCalculatorMetadata } from '@/lib/metadata';
@@ -72,10 +71,12 @@ export default function CalculatorPage({ params }: Props) {
         </div>
       </div>
 
-      <div className='max-w-[80vw]'>
-      <AdBanner adType="video-horizontal-1" />
+      {/* First Horizontal Video Ad */}
+      <div className="flex items-center justify-center w-full">
+        <div className="w-full sm:w-[90vw] sm:h-[10vh] md:w-[80vw] md:h-[20vh] flex items-center justify-center">
+          <AdBanner adType="video-horizontal-1" className="m-0" />
+        </div>
       </div>
-
 
       {/* Calculator Component */}
       <CalculatorComponent calculatorId={calculator.id} />
@@ -108,9 +109,12 @@ export default function CalculatorPage({ params }: Props) {
         </section>
       )}
        
-      <div className='flex items-center justify-center m-0 p-0 sm:w-[90vw] w-[80vw] max-h-[20vh]'>
-      <AdBanner adType="video-horizontal-2" className='' />
-      </div> 
+      {/* Second Horizontal Video Ad */}
+      <div className="flex items-center justify-center w-full">
+        <div className="w-full sm:w-[90vw] sm:h-[10vh] md:w-[80vw] md:h-[20vh] flex items-center justify-center">
+          <AdBanner adType="video-horizontal-2" className="m-0" />
+        </div>
+      </div>
 
       {/* SEO Content */}
       <section className="py-16 bg-gray-50">
@@ -174,8 +178,11 @@ export default function CalculatorPage({ params }: Props) {
         </div>
       </section>
 
-      <div className='max-w-[80vw]'>
-      <AdBanner adType="image-portrait-1" />  
+      {/* Portrait Image Ad */}
+      <div className="flex items-center justify-center w-full">
+        <div className="w-full max-w-[80vw] flex items-center justify-center">
+          <AdBanner adType="image-portrait-1" className="m-0" />
+        </div>
       </div>
     </div>
   );
