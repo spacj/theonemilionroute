@@ -3,8 +3,36 @@
 import { useState } from 'react';
 import { TrendingUp, DollarSign, Percent } from 'lucide-react';
 
+interface YearlyData {
+  year: number;
+  balance: number;
+  totalContributions: number;
+  interestEarned: number;
+  yearlyGrowth: number;
+}
+
+interface CalculationResult {
+  futureValue: number;
+  totalInterest: number;
+  totalContributions: number;
+  yearlyData: YearlyData[];
+  effectiveAnnualRate: number;
+  periodicRate: number;
+  roi: number;
+  contributionFrequencyText: string;
+  interestRateLabel: string;
+}
+
+interface Inputs {
+  principal: number;
+  rate: number;
+  time: number;
+  contributionFrequency: number;
+  contributionAmount: number;
+}
+
 export default function CompoundInterestCalculator() {
-  const [inputs, setInputs] = useState({
+  const [inputs, setInputs] = useState<Inputs>({
     principal: 5000,
     rate: 5,
     time: 5,
@@ -12,7 +40,7 @@ export default function CompoundInterestCalculator() {
     contributionAmount: 0
   });
   
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<CalculationResult | null>(null);
 
   const calculate = () => {
     const { principal, rate, time, contributionFrequency, contributionAmount } = inputs;
@@ -23,21 +51,20 @@ export default function CompoundInterestCalculator() {
       return;
     }
     
-    const annualRate = rate / 100;
-    // Use the contribution frequency as the compounding frequency for consistency
+    // Now rate is already the periodic rate (matches the frequency)
+    const periodicRate = rate / 100;
     const compoundFrequency = contributionFrequency;
-    const periodicRate = annualRate / compoundFrequency;
     const totalPeriods = time * compoundFrequency;
     
     // Calculate compound interest with regular contributions
     let futureValue;
     
     if (contributionAmount === 0) {
-      // Simple compound interest: A = P(1 + r/n)^(nt)
+      // Simple compound interest: A = P(1 + r)^t
       futureValue = principal * Math.pow(1 + periodicRate, totalPeriods);
     } else {
       // Compound interest with regular contributions
-      // FV = P(1 + r/n)^(nt) + PMT[((1 + r/n)^(nt) - 1) / (r/n)]
+      // FV = P(1 + r)^t + PMT[((1 + r)^t - 1) / r]
       const compoundedPrincipal = principal * Math.pow(1 + periodicRate, totalPeriods);
       
       let contributionFutureValue = 0;
@@ -55,7 +82,7 @@ export default function CompoundInterestCalculator() {
     const totalInterest = futureValue - totalContributions;
     
     // Generate yearly breakdown
-    const yearlyData = [];
+    const yearlyData: YearlyData[] = [];
     let currentBalance = principal;
     let totalContributionsSoFar = principal;
     
@@ -84,8 +111,13 @@ export default function CompoundInterestCalculator() {
       });
     }
     
-    // Calculate effective annual rate (APY)
-    const effectiveRate = ((Math.pow(1 + periodicRate, compoundFrequency) - 1) * 100);
+    // Calculate effective annual rate - convert periodic rate to annual
+    let effectiveAnnualRate;
+    if (contributionFrequency === 1) {
+      effectiveAnnualRate = rate; // Already annual
+    } else {
+      effectiveAnnualRate = ((Math.pow(1 + periodicRate, contributionFrequency) - 1) * 100);
+    }
     
     // Calculate ROI
     const roi = ((futureValue - totalContributions) / totalContributions * 100);
@@ -95,9 +127,11 @@ export default function CompoundInterestCalculator() {
       totalInterest,
       totalContributions,
       yearlyData,
-      effectiveRate,
+      effectiveAnnualRate,
+      periodicRate: rate,
       roi,
-      contributionFrequencyText: getContributionFrequencyText(contributionFrequency)
+      contributionFrequencyText: getContributionFrequencyText(contributionFrequency),
+      interestRateLabel: getInterestRateLabel(contributionFrequency)
     });
   };
 
@@ -266,20 +300,20 @@ export default function CompoundInterestCalculator() {
                   <div className="bg-gradient-to-br from-purple-50 to-violet-50 p-6 rounded-xl border border-purple-200">
                     <div className="flex items-center mb-2">
                       <Percent className="w-5 h-5 text-purple-600 mr-2" />
-                      <h3 className="text-lg font-semibold text-purple-900">Effective Annual Rate</h3>
+                      <h3 className="text-lg font-semibold text-purple-900">{result.interestRateLabel} Rate</h3>
                     </div>
                     <p className="text-3xl font-bold text-purple-600">
-                      {formatPercent(result.effectiveRate)}
+                      {formatPercent(result.periodicRate)}
                     </p>
-                    <p className="text-sm text-purple-700 mt-1">APY with compounding</p>
+                    <p className="text-sm text-purple-700 mt-1">Per {result.contributionFrequencyText.toLowerCase()} period</p>
                   </div>
                   
                   <div className="bg-gradient-to-br from-orange-50 to-red-50 p-6 rounded-xl border border-orange-200">
-                    <h3 className="text-lg font-semibold text-orange-900 mb-2">Return on Investment</h3>
+                    <h3 className="text-lg font-semibold text-orange-900 mb-2">Effective Annual Rate</h3>
                     <p className="text-3xl font-bold text-orange-600">
-                      {formatPercent(result.roi)}
+                      {formatPercent(result.effectiveAnnualRate)}
                     </p>
-                    <p className="text-sm text-orange-700 mt-1">Total ROI over {inputs.time} years</p>
+                    <p className="text-sm text-orange-700 mt-1">Annualized return (APY)</p>
                   </div>
                 </div>
 
@@ -305,8 +339,12 @@ export default function CompoundInterestCalculator() {
                         <span className="font-semibold">{formatCurrency(inputs.contributionAmount * inputs.contributionFrequency)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Annual Interest Rate:</span>
+                        <span className="text-gray-600">{result.interestRateLabel} Interest Rate:</span>
                         <span className="font-semibold">{inputs.rate}%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Effective Annual Rate:</span>
+                        <span className="font-semibold">{formatPercent(result.effectiveAnnualRate)}</span>
                       </div>
                     </div>
                     <div className="space-y-3">
@@ -379,7 +417,7 @@ export default function CompoundInterestCalculator() {
                         </tr>
                       </thead>
                       <tbody>
-                        {result.yearlyData.map((data: any, index: number) => (
+                        {result.yearlyData.map((data: YearlyData, index: number) => (
                           <tr key={data.year} className={`border-b border-gray-100 ${index % 2 === 0 ? 'bg-gray-25' : 'bg-white'}`}>
                             <td className="py-3 px-2 text-gray-600 font-medium">{data.year}</td>
                             <td className="py-3 px-2 text-right font-bold">{formatCurrency(data.balance)}</td>
