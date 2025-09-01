@@ -73,7 +73,7 @@ export default function CalculatorPage({ params }: Props) {
 
       {/* First Horizontal Video Ad */}
       <div className="flex items-center justify-center w-full">
-        <div className="sm:max-w-[90vw] sm:h-[10vh] md:w-[80vw] md:h-[20vh] xl:w-[70vw] flex items-center justify-center overflow-hidden">
+        <div className="w-full sm:max-w-[90vw] sm:h-[10vh] md:w-[80vw] md:h-[20vh] xl:w-[70vw] flex items-center justify-center overflow-hidden">
           <AdBanner adType="video-horizontal-1" className="m-0 w-full h-full" />
         </div>
       </div>
@@ -111,8 +111,8 @@ export default function CalculatorPage({ params }: Props) {
        
       {/* Second Horizontal Video Ad */}
       <div className="flex items-center justify-center w-full">
-        <div className="sm:max-w-[90vw] sm:h-[10vh] md:w-[80vw] xl:w-[70vw] md:h-[20vh] flex items-center justify-center overflow-hidden">
-          <AdBanner adType="video-horizontal-2" className="m-0 w-full h-full" />
+        <div className="w-full sm:h-[10vh] md:w-[80vw] xl:w-[70vw] md:h-[20vh] flex items-center justify-center overflow-hidden">
+          <AdBanner adType="video-horizontal-2" className="m-0 sm:w-[90vw]  h-full" />
         </div>
       </div>
 
