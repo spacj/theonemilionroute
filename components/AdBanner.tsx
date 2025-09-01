@@ -71,7 +71,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       type: 'image',
       height: 0, // Auto height based on aspect ratio
       width: 240,
-      imageSrc: '/images/portrait-ad-1.jpg', // Replace with your actual image path
+      imageSrc: '/images/image-portrait-1.jpg', // Replace with your actual image path
       link: 'https://amzn.to/4m3ScKQ', // Replace with your actual link
       aspectRatio: '4:5'
     },
@@ -80,7 +80,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       type: 'image',
       height: 0, // Auto height based on aspect ratio
       width: 240,
-      imageSrc: '/images/portrait-ad-2.jpg', // Replace with your actual image path
+      imageSrc: '/images/image-portrait-2.jpg', // Replace with your actual image path
       link: 'https://www.amazon.com/dp/B0FPBV1S3F', // Replace with your actual link
       aspectRatio: '4:5'
     }
