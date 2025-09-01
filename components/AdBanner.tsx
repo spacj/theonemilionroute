@@ -151,7 +151,7 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
           className="block hover:opacity-80 transition-opacity duration-200 w-full h-full"
         >
           <video
-            className="w-full h-full object-contain rounded-lg shadow-lg block min-h-0"
+            className="w-full h-full object-fill rounded-lg shadow-lg block min-h-0"
             autoPlay
             muted
             loop
