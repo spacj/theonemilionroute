@@ -73,7 +73,7 @@ export default function CalculatorPage({ params }: Props) {
 
       {/* First Horizontal Video Ad */}
       <div className="flex items-center justify-center w-full">
-        <div className="w-full sm:w-[90vw] sm:h-[10vh] md:w-[80vw] md:h-[20vh] flex items-center justify-center">
+        <div className="w-full sm:w-[90vw] sm:max-h-[10vh] md:w-[80vw] md:max-h-[20vh] flex items-center justify-center">
           <AdBanner adType="video-horizontal-1" className="m-0" />
         </div>
       </div>
