@@ -143,15 +143,15 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
   // Render video ad
   if (config.type === 'video') {
     return (
-      <div className={`my-8 ${className}`}>
+      <div className={`${className.includes('m-0') ? '' : 'my-8'} w-full h-full flex items-center justify-center ${className}`}>
         <a
           href={config.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="block hover:opacity-80 transition-opacity duration-200"
+          className="block hover:opacity-80 transition-opacity duration-200 w-full h-full"
         >
           <video
-            className="w-full h-auto rounded-lg shadow-lg block"
+            className="w-full h-full object-cover rounded-lg shadow-lg block min-h-0"
             autoPlay
             muted
             loop
