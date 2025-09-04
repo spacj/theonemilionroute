@@ -53,15 +53,15 @@ export default function AdBanner({ className = '', adType = 'banner' }: AdBanner
       height: 200,
       width: 400,
       videoSrc: '/videos/germanguide.mp4',
-      link: 'https://malekai72.gumroad.com/l/losta' // Replace with your actual link
+      link: 'https://digitalorientation.gumroad.com/l/GermanSurivalGuide' // Replace with your actual link
     },
     // Square image ad(s) - auto height
     'image-square': {
       type: 'image',
       height: 0, // Auto height
       width: 200,
-      imageSrc: '/images/n26refer.jpg',
-      link: 'https://example3.com', // Replace with your actual link
+      imageSrc: '/images/gumroadaff.jpg',
+      link: 'https://digitalorientation.gumroad.com/affiliates', // Replace with your actual link
       secondImageSrc: '/images/n26refer.jpg',
       secondLink: 'https://example4.com', // Replace with your actual link for second image
       aspectRatio: '1:1'
