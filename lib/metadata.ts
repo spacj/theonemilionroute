@@ -12,7 +12,7 @@ export function generateCalculatorMetadata(slug: string): Metadata {
   }
 
   return {
-    title: `${calculator.title} | Your Blog Name`,
+    title: `${calculator.title} | OneMilionRoute.com`,
     description: calculator.metaDescription,
     keywords: calculator.keywords.join(', '),
     openGraph: {
