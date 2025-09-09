@@ -35,8 +35,9 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center group">
             <span className="text-2xl font-bold uppercase text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors duration-300">
-              OneMillion
+              OneMilion
               <span className="text-blue-600 group-hover:text-gray-900">Route</span>
+              .com
             </span>
           </Link>
 

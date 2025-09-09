@@ -7,7 +7,7 @@ export default function PrivacyPolicy() {
   return (
     <>
       <Head>
-        <title>Privacy Policy - OneMilioRoute.com</title>
+        <title>Privacy Policy - OneMilionRoute.com</title>
         <meta name="description" content="Privacy Policy for OneMilioRoute.com - Learn how we collect, use, and protect your personal information." />
         <meta name="robots" content="index, follow" />
       </Head>
@@ -168,7 +168,7 @@ export default function PrivacyPolicy() {
                   <p className="mb-4">If you have any questions about this Privacy Policy or our privacy practices, please contact us:</p>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p><strong>Email:</strong> greenwue@proton.me</p>
-                    <p><strong>Address:</strong> OneMilioRoute.com</p>
+                    <p><strong>Address:</strong> OneMilionRoute.com</p>
                   </div>
                 </section>
               </div>
