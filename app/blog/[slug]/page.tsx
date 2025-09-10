@@ -1,236 +1,198 @@
-// app/blog/[slug]/page.tsx
+// components/BlogPostClient.tsx
+'use client'
 
-import { notFound } from 'next/navigation'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getPostBySlug, getAllPosts, getRelatedPosts } from '@/lib/mdx'
-import BlogPostClient from '@/components/BlogPostClient'
-import AdBanner from '@/components/AdBanner' // Import the AdBanner component
-import { Calendar, Clock, User, Tag } from 'lucide-react'
-import type { Metadata } from 'next'
+import { Share2, Facebook, Twitter, Linkedin, Mail, Calendar, Clock, User, Tag } from 'lucide-react'
+import ContentAdInjector from '../../../components/ContentAdInjector'
 
-interface Props {
-  params: { slug: string }
+interface Post {
+  slug: string
+  title: string
+  subtitle: string
+  content: string
+  date: string
+  author: string
+  tags: string[]
+  image: string
+  readingTime: string
 }
 
-export async function generateStaticParams() {
-  const posts = getAllPosts()
-  return posts.map((post) => ({
-    slug: post.slug,
-  }))
+interface BlogPostClientProps {
+  post: Post
+  relatedPosts: Post[]
+  newestPosts: Post[]
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug)
+export default function BlogPostClient({ post, relatedPosts, newestPosts }: BlogPostClientProps) {
+  const [showShareMenu, setShowShareMenu] = useState(false)
 
-  if (!post) {
-    return { title: 'Post Not Found' }
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareText = `${post.title} - ${post.subtitle}`
+
+  const shareLinks = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+    email: `mailto:?subject=${encodeURIComponent(post.title)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
   }
-  const absoluteImage = post.image.startsWith('/images') 
-  ? `https://onemilionroute.com${post.image}`
-  : `https://onemilionroute.com/images${post.image}`
-  return {
-    title: post.title,
-    description: post.subtitle,
-    keywords: post.tags,
-    authors: [{ name: post.author }],
-    openGraph: {
-      title: post.title,
-      description: post.subtitle,
-      type: 'article',
-      publishedTime: post.date,
-      authors: [post.author],
-      images: [
-        {
-          url: absoluteImage,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.subtitle,
-      images: [absoluteImage],
-    },
-  }
-}
-
-export default async function BlogPost({ params }: Props) {
-  const post = await getPostBySlug(params.slug)
-
-  if (!post) {
-    notFound()
-  }
-
-  const relatedPosts = getRelatedPosts(post.slug, post.tags)
-  const newestPosts = getAllPosts().slice(0, 3)
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Main Content */}
-        <article className="flex-1 max-w-4xl lg:max-w-none">
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {post.tags.slice(0, 2).map((tag) => (
+    <div>
+      {/* Social Share */}
+      <div className="flex items-center justify-between border-t border-b border-gray-200 py-4 mb-8">
+        <div className="flex items-center space-x-4">
+          <span className="text-sm font-medium text-gray-700">Share this article:</span>
+          <div className="flex space-x-2">
+            <a
+              href={shareLinks.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+            >
+              <Facebook className="w-4 h-4" />
+            </a>
+            <a
+              href={shareLinks.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-50 rounded-full transition-colors"
+            >
+              <Twitter className="w-4 h-4" />
+            </a>
+            <a
+              href={shareLinks.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-gray-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+            >
+              <Linkedin className="w-4 h-4" />
+            </a>
+            <a
+              href={shareLinks.email}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-full transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content with Injected Ads */}
+      <div className="mb-12">
+        <ContentAdInjector 
+          content={post.content} 
+          targetInterval={700} 
+        />
+      </div>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-8 pt-8 border-t border-gray-200">
+        <span className="text-sm font-medium text-gray-700 mr-2">Tags:</span>
+        {post.tags.map((tag) => (
+          <Link
+            key={tag}
+            href={`/tag/${tag.toLowerCase()}`}
+            className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-200 transition-colors"
+          >
+            <Tag className="w-3 h-3 mr-1" />
+            {tag}
+          </Link>
+        ))}
+      </div>
+
+      {/* Author Bio */}
+      <div className="bg-gray-50 rounded-xl p-6 mb-12">
+        <div className="flex items-start space-x-4">
+          <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+            <User className="w-8 h-8 text-gray-600" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              About {post.author}
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Travel enthusiast and blogger sharing insights from adventures around the world. 
+              Passionate about discovering hidden gems and authentic local experiences.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedPosts.slice(0, 3).map((relatedPost) => (
               <Link
-                key={tag}
-                href={`/tag/${tag.toLowerCase()}`}
-                className="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors"
+                key={relatedPost.slug}
+                href={`/blog/${relatedPost.slug}`}
+                className="group block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
               >
-                <Tag className="w-3 h-3 mr-1" />
-                {tag}
+                <div className="relative h-48">
+                  <Image
+                    src={relatedPost.image}
+                    alt={relatedPost.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
+                    {relatedPost.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                    {relatedPost.subtitle}
+                  </p>
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Calendar className="w-3 h-3 mr-1" />
+                    {new Date(relatedPost.date).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                    <Clock className="w-3 h-3 ml-3 mr-1" />
+                    {relatedPost.readingTime}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
+        </div>
+      )}
 
-          {/* Header */}
-          <header className="mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{post.title}</h1>
-            <p className="text-xl text-gray-600 mb-6">{post.subtitle}</p>
-
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 mb-8">
-              <div className="flex items-center">
-                <User className="w-4 h-4 mr-2" />
-                {post.author}
-              </div>
-              <div className="flex items-center">
-                <Calendar className="w-4 h-4 mr-2" />
-                {new Date(post.date).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                {post.readingTime}
-              </div>
-            </div>
-
-            <div className="relative w-full max-w-4xl mx-auto">
-              <Image
-                src={post.image}
-                alt={post.title}
-                width={800}
-                height={400}
-                className="w-full h-64 md:h-96 object-cover rounded-xl"
-                priority
-              />
-            </div>
-          </header>
-
-          {/* Ad after hero image - Mobile: Banner, Desktop: Video */}
-          <div className="block lg:hidden">
-            <AdBanner adType="banner" className="my-6" />
-          </div>
-          <div className="hidden lg:block">
-            <AdBanner adType="video-horizontal-1" className="my-8" />
-          </div>
-
-          {/* Use client wrapper for interactive parts */}
-          <BlogPostClient 
-            post={post} 
-            relatedPosts={relatedPosts} 
-            newestPosts={newestPosts} 
+      {/* Newsletter Signup */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-8 text-center mb-12">
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Never Miss an Adventure
+        </h3>
+        <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+          Subscribe to our newsletter and get the latest travel guides, tips, and exclusive content delivered directly to your inbox.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+          <input
+            type="email"
+            placeholder="Enter your email"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-
-          {/* Ad before related posts - Different video for variety */}
-          <div className="hidden lg:block mt-12 mb-8">
-            <AdBanner adType="video-horizontal-2" className="my-8" />
-          </div>
-          
-          {/* Mobile ad before related posts */}
-          <div className="block lg:hidden mt-8 mb-6">
-            <AdBanner adType="image-square" className="my-6" />
-          </div>
-        </article>
-
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-80 xl:w-96 shrink-0">
-          <div className="sticky top-8 space-y-8">
-            {/* Portrait Ad 1 */}
-            <div className="flex justify-center">
-              <div className="max-w-xs w-full">
-                <AdBanner adType="image-portrait-1" className="m-0" />
-              </div>
-            </div>
-
-            {/* Newsletter/CTA Section (Optional) */}
-            <div className="bg-gray-50 rounded-xl p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                Stay Updated
-              </h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Get the latest travel tips and guides delivered to your inbox.
-              </p>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                Subscribe Now
-              </button>
-            </div>
-
-            {/* Portrait Ad 2 */}
-            <div className="flex justify-center">
-              <div className="max-w-xs w-full">
-                <AdBanner adType="image-portrait-2" className="m-0" />
-              </div>
-            </div>
-
-            {/* Recent Posts */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Recent Posts
-              </h3>
-              <div className="space-y-4">
-                {newestPosts.slice(0, 4).map((recentPost) => (
-                  <Link
-                    key={recentPost.slug}
-                    href={`/blog/${recentPost.slug}`}
-                    className="block group"
-                  >
-                    <div className="flex gap-3">
-                      <div className="relative w-16 h-12 shrink-0">
-                        <Image
-                          src={recentPost.image}
-                          alt={recentPost.title}
-                          fill
-                          className="object-cover rounded-lg"
-                          sizes="64px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                          {recentPost.title}
-                        </h4>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {new Date(recentPost.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Square Ad at bottom of sidebar */}
-            <div className="flex justify-center">
-              <div className="max-w-sm w-full">
-                <AdBanner adType="image-square" className="m-0" />
-              </div>
-            </div>
-          </div>
-        </aside>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors whitespace-nowrap">
+            Subscribe
+          </button>
+        </div>
       </div>
 
-      {/* Mobile-only: Final ad at bottom */}
-      <div className="block lg:hidden mt-12">
-        <AdBanner adType="banner" className="my-6" />
+      {/* Comments Section Placeholder */}
+      <div className="border-t border-gray-200 pt-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Comments</h3>
+        <div className="bg-gray-50 rounded-lg p-8 text-center">
+          <p className="text-gray-600">
+            Comments section will be implemented here using your preferred commenting system 
+            (Disqus, Giscus, etc.)
+          </p>
+        </div>
       </div>
     </div>
   )
