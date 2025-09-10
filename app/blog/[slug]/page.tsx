@@ -5,11 +5,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getPostBySlug, getAllPosts, getRelatedPosts } from '@/lib/mdx'
 import BlogPostClient from '@/components/BlogPostClient'
-import AdBanner from '@/components/AdBanner'
+import AdBanner from '@/components/AdBanner' // Import the AdBanner component
 import { Calendar, Clock, User, Tag } from 'lucide-react'
 import type { Metadata } from 'next'
 
-interface BlogPostPageProps {
+interface Props {
   params: { slug: string }
 }
 
@@ -20,17 +20,15 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getPostBySlug(params.slug)
 
   if (!post) {
     return { title: 'Post Not Found' }
   }
-  
   const absoluteImage = post.image.startsWith('/images') 
-    ? `https://onemilionroute.com${post.image}`
-    : `https://onemilionroute.com/images${post.image}`
-    
+  ? `https://onemilionroute.com${post.image}`
+  : `https://onemilionroute.com/images${post.image}`
   return {
     title: post.title,
     description: post.subtitle,
@@ -60,7 +58,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   }
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPost({ params }: Props) {
   const post = await getPostBySlug(params.slug)
 
   if (!post) {
